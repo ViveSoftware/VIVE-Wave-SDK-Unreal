@@ -1,0 +1,90 @@
+apply plugin: 'com.android.application'
+
+android {
+	compileSdkVersion = COMPILE_SDK_VERSION.toInteger()
+	buildToolsVersion = BUILD_TOOLS_VERSION
+	defaultConfig {
+		applicationId = PACKAGE_NAME
+		minSdkVersion = MIN_SDK_VERSION.toInteger()
+		targetSdkVersion = TARGET_SDK_VERSION.toInteger()
+		versionCode = STORE_VERSION.toInteger()
+		versionName = VERSION_DISPLAY_NAME
+	}
+}
+
+apply from: 'buildAdditions.gradle'
+
+android {
+
+	// work in progress
+	//externalNativeBuild {
+	//	cmake {
+	//		path 'CMakeLists.txt'
+	//	}
+	//}
+
+	sourceSets.main {
+		// disable generation of Android.mk
+		jni.srcDirs = []
+
+                jniLibs.srcDirs = ['src/main/jniLibs', 'src/main/libs']
+
+		// aidl in java directories
+		aidl.srcDirs = java.srcDirs
+		// aidl.srcDirs = ['src/main/aidl', 'src/main/java']
+	}
+
+	lintOptions {
+		// uncomment to get a report
+		//htmlOutput file("lint-report.html")
+
+		// turn this back on if you want to check
+		checkReleaseBuilds false
+
+		// this will prevent it from stopping if above is true and an issue is found
+		abortOnError false
+	}
+
+	applicationVariants.all { variants ->
+		outputs.all {
+			// move it up one level to help with path limit (app/build/outputs/apk/app-debug.apk or app-release.apk)
+			outputFileName = "../" + outputFileName
+		}
+	}
+}
+
+task ue4CompleteRelease(type: Copy) {
+	description "Copy final release APK"
+	from 'build/outputs/apk/app-release.apk'
+	into OUTPUT_PATH
+	rename ("app-release.apk", OUTPUT_FILENAME)
+}
+
+task ue4CompleteDebug(type: Copy) {
+	description "Copy final debug APK"
+	from 'build/outputs/apk/app-debug.apk'
+	into OUTPUT_PATH
+	rename ("app-debug.apk", OUTPUT_FILENAME)
+}
+
+tasks.whenTaskAdded { task ->
+	if (task.name == 'assembleRelease') {
+		task.finalizedBy 'ue4CompleteRelease'
+	}
+	if (task.name == 'assembleDebug') {
+		task.finalizedBy 'ue4CompleteDebug'
+	}
+}
+
+
+dependencies {
+        fileTree(dir: 'src/main/libs', include: '*.aar')
+        .each { File file ->
+                dependencies.add("compile", [
+                    name: file.name.lastIndexOf('.').with { it != -1 ? file.name[0..<it] : file.name },
+                    ext: 'aar'
+                ])
+        }
+	implementation fileTree(dir: 'libs', include: ['*.jar'])
+	implementation fileTree(dir: 'src/main/libs', include: ['*.jar'])
+}

@@ -1,0 +1,10 @@
+{
+	"BuildId": "4541578",
+	"Modules": 
+	{
+		"WaveVR": "UE4Editor-WaveVR.dll",
+		"WaveVREditor": "UE4Editor-WaveVREditor.dll",
+		"WaveVRGesture": "UE4Editor-WaveVRGesture.dll",
+		"WaveVRInput": "UE4Editor-WaveVRInput.dll"
+	}
+}

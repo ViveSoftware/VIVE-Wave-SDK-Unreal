@@ -1,0 +1,50 @@
+﻿{
+	"FileVersion" : 3,
+	"Version" : 1,
+	"VersionName" : "1.0",
+	"FriendlyName" : "WaveVR Plugin",
+	"Description" : "Support for the WVR API",
+	"Category" : "Virtual Reality",
+	"CreatedBy" : "hTC Corporation.",
+	"CreatedByURL" : "http://htc.com",
+	"DocsURL" : "",
+	"MarketplaceURL" : "",
+	"SupportURL" : "",
+	"EnabledByDefault" : true,
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "WaveVR",
+			"Type": "Runtime",
+			"LoadingPhase": "PostConfigInit",
+			"WhitelistPlatforms": [ "Android", "Win64" ],
+			"AdditionalDependencies": [ "ProceduralMeshComponent" ]
+		},
+		{
+			"Name": "WaveVRInput",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms": [ "Android", "Win64" ]
+		},
+		{
+			"Name": "WaveVREditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "WaveVRGesture",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms": [ "Android", "Win64" ]
+		}
+	],
+	"Plugins":
+	[
+		{
+			"Name": "ProceduralMeshComponent",
+			"Enabled": true
+		}
+	]
+}
