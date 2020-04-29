@@ -8,8 +8,8 @@
 // conditions signed by you and all SDK and API requirements,
 // specifications, and documentation provided by HTC to You."
 
-#include "WaveVRPrivatePCH.h"
 #include "RequestUsbResultObject.h"
+#include "WaveVRPrivatePCH.h"
 
 FRequestUsbResultDelNative URequestUsbResultObject::onRequestUsbResultNative;
 

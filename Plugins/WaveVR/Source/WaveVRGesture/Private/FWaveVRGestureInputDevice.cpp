@@ -8,8 +8,8 @@
 // conditions signed by you and all SDK and API requirements,
 // specifications, and documentation provided by HTC to You."
 
-#include "IWaveVRGesture.h"
 #include "FWaveVRGestureInputDevice.h"
+#include "IWaveVRGesture.h"
 #include "WaveVRStaticGestureComponent.h"
 #include "WaveVRUtils.h"
 

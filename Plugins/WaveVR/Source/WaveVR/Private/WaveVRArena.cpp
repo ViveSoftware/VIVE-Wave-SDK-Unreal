@@ -8,8 +8,8 @@
 // conditions signed by you and all SDK and API requirements,
 // specifications, and documentation provided by HTC to You."
 
-#include "WaveVRPrivatePCH.h"
 #include "WaveVRArena.h"
+#include "WaveVRPrivatePCH.h"
 
 // class ArenaImpl
 ArenaImpl* ArenaImpl::mInstance = nullptr;

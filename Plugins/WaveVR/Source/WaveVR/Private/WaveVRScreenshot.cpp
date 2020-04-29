@@ -8,14 +8,14 @@
 // conditions signed by you and all SDK and API requirements,
 // specifications, and documentation provided by HTC to You."
 
-#include "WaveVRPrivatePCH.h"
 #include "WaveVRScreenshot.h"
+#include "WaveVRPrivatePCH.h"
 
 #include <ctime>
 
 #if WAVEVR_SUPPORTED_PLATFORMS
-#include "AndroidApplication.h"
-#include "AndroidJNI.h"
+#include "Android/AndroidApplication.h"
+#include "Android/AndroidJNI.h"
 #endif
 
 DEFINE_LOG_CATEGORY(LogWaveVRScreenshot);

@@ -8,8 +8,8 @@
 // conditions signed by you and all SDK and API requirements,
 // specifications, and documentation provided by HTC to You."
 
-#include "WaveVRPrivatePCH.h"
 #include "AdaptiveControllerLoader.h"
+#include "WaveVRPrivatePCH.h"
 #include "Runtime/ImageWrapper/Public/IImageWrapper.h"
 #include "Runtime/ImageWrapper/Public/IImageWrapperModule.h"
 #include "Runtime/Json/Public/Json.h"

@@ -26,7 +26,7 @@ class WAVEVR_API UWaveVRRenderMaskComponent : public UProceduralMeshComponent
 	GENERATED_BODY()
 
 public:
-	UWaveVRRenderMaskComponent();
+	UWaveVRRenderMaskComponent(const FObjectInitializer& ObjectInitializer);
 	virtual void PostLoad() override;
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

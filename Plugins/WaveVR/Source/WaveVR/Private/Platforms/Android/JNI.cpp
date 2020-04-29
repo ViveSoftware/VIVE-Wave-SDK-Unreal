@@ -13,8 +13,8 @@
 #include "RequestUsbResultObject.h"
 #include "WaveVREventCommon.h"
 
-#include "AndroidApplication.h"
-#include "AndroidJNI.h"
+#include "Android/AndroidApplication.h"
+#include "Android/AndroidJNI.h"
 #include <android/log.h>
 
 #undef LOG_TAG

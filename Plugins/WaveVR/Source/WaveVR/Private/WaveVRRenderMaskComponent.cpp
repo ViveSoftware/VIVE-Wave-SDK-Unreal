@@ -8,15 +8,15 @@
 // conditions signed by you and all SDK and API requirements,
 // specifications, and documentation provided by HTC to You."
 
-#include "WaveVRPrivatePCH.h"
 #include "WaveVRRenderMaskComponent.h"
+#include "WaveVRPrivatePCH.h"
 #include "WaveVRHMD.h"
 #include "Engine.h"
 
 #include "Platforms/WaveVRAPIWrapper.h"
 #include "Platforms/WaveVRLogWrapper.h"
 
-#include "ConstructorHelpers.h"
+#include "UObject/ConstructorHelpers.h"
 #include "Materials/MaterialInstanceDynamic.h"
 
 #include "Logging/LogMacros.h"
@@ -32,7 +32,7 @@ DEFINE_LOG_CATEGORY_STATIC(RenderMask, Display, All);
 #define PLATFORM_CHAR(str) str
 #endif
 
-UWaveVRRenderMaskComponent::UWaveVRRenderMaskComponent() : Color(), UseDebugMesh(false), UseEyeSpecifiedMesh(false) {
+UWaveVRRenderMaskComponent::UWaveVRRenderMaskComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer), Color(), UseDebugMesh(false), UseEyeSpecifiedMesh(false) {
 	CastShadow = 0;
 	bReceiveMobileCSMShadows = 0;
 }
@@ -101,7 +101,7 @@ void UWaveVRRenderMaskComponent::TickComponent(float DeltaTime, ELevelTick TickT
 		vertexDataR = nullptr;
 		indexDataR = nullptr;
 
-		LOGI(RenderMask, "CreateMesh: RelativeLocation (%f, %f, %f) to %s", RelativeLocation.X, RelativeLocation.Y, RelativeLocation.Z, PLATFORM_CHAR(*parentName));
+		LOGI(RenderMask, "CreateMesh: RelativeLocation (%f, %f, %f) to %s", GetRelativeLocation().X, GetRelativeLocation().Y, GetRelativeLocation().Z, PLATFORM_CHAR(*parentName));
 	}
 
 	if (bLateUpdate && IsVisible())
@@ -374,9 +374,9 @@ void UWaveVRRenderMaskComponent::CreateMesh() {
 	// Find the vertices not on the clipping space boundary.
 	const float ZDistance = ZNear + 0.01f;  // Near clipping plane plus 1cm.  Where the WaveVRRenderMaskComponent place at front of head.
 
-	RelativeLocation = FVector(ZDistance * WorldUnitToMeter, 0, 0);
-	RelativeRotation = FRotator::ZeroRotator;
-	RelativeScale3D = FVector::OneVector;
+	SetRelativeLocation(FVector(ZDistance * WorldUnitToMeter, 0, 0));
+	SetRelativeRotation(FRotator::ZeroRotator);
+	SetRelativeScale3D(FVector::OneVector);
 	// If use SetRelativeLocationAndRotation, the value will not be set exactly.  Some shift may happen when level is first level.
 	//SetRelativeLocationAndRotation(FVector(ZDistance * WorldUnitToMeter, 0, 0), FQuat::Identity);
 

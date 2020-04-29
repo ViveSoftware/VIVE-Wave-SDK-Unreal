@@ -8,8 +8,8 @@
 // conditions signed by you and all SDK and API requirements,
 // specifications, and documentation provided by HTC to You."
 
-#include "WaveVRPrivatePCH.h"
 #include "WaveVRController.h"
+#include "WaveVRPrivatePCH.h"
 #include "Platforms/Editor/WaveVRDirectPreview.h"
 #include "PoseManagerImp.h"
 #include "WaveVRHMD.h"

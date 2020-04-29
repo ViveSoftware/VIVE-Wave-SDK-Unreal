@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "EngineMinimal.h"
 #include "Components/ActorComponent.h"
 #include "WaveVRCameraTexture.generated.h"
 

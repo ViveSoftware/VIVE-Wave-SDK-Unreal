@@ -18,8 +18,10 @@ namespace UnrealBuildTool.Rules
 		public WaveVREditor(ReadOnlyTargetRules Target) : base(Target)
 		{
 			Debug.Print("Build the WaveVR Editor Module");
+
+			PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
+
 			var EngineDir = Path.GetFullPath(Target.RelativeEnginePath);
-			PrivatePCHHeaderFile = "Private/WaveVRSettings.h";
 
 			PublicDependencyModuleNames.AddRange(
 			new string[]

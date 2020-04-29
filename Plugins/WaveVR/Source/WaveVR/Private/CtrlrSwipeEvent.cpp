@@ -8,8 +8,8 @@
 // conditions signed by you and all SDK and API requirements,
 // specifications, and documentation provided by HTC to You."
 
-#include "WaveVRPrivatePCH.h"
 #include "CtrlrSwipeEvent.h"
+#include "WaveVRPrivatePCH.h"
 
 FCtrlrSwipeLRDelNative UCtrlrSwipeEvent::onCtrlrSwipeLtoRUpdateNative;
 FCtrlrSwipeRLDelNative UCtrlrSwipeEvent::onCtrlrSwipeRtoLUpdateNative;

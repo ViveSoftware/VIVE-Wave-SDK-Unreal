@@ -14,7 +14,7 @@
 #include "WaveVRController.h"
 #include "WaveVRInputSimulator.h"
 
-#include "IInputInterface.h"
+#include "GenericPlatform/IInputInterface.h"
 #include "XRMotionControllerBase.h"
 #include "IHapticDevice.h"
 

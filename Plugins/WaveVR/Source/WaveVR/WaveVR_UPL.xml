@@ -170,9 +170,9 @@
 				return true;
 			}
 
-			// Let WVR be identified as GearVR can avoid to modify the UE.
-			// The GearVR's render initializtions are necessary for WaveVR.
-			public boolean AndroidThunkJava_IsGearVRApplication()
+			// Let WVR be identified as OculusMobile can avoid to modify the UE.
+			// The OculusMobile's render initializtions are necessary for WaveVR.
+			public boolean AndroidThunkJava_IsOculusMobileApplication()
 			{
 				return true;
 			}

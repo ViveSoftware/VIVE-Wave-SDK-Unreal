@@ -8,17 +8,15 @@
 // conditions signed by you and all SDK and API requirements,
 // specifications, and documentation provided by HTC to You."
 
-#include "WaveVRPrivatePCH.h"
-
-#include "Logging/LogMacros.h"
-
 #include "Platforms/Editor/WaveVRDirectPreview.h"
+#include "WaveVRPrivatePCH.h"
+#include "Logging/LogMacros.h"
 #include "Platforms/DLLFunctionPointer.h"
 #include "WaveVRHMD.h"
 #include <chrono>
 #if WITH_EDITOR
 #include "WaveVRDirectPreviewSettings.h"
-#include "Classes/Settings/LevelEditorPlaySettings.h"
+#include "Settings/LevelEditorPlaySettings.h"
 #endif
 
 DEFINE_LOG_CATEGORY_STATIC(WVRDirectPreview, Log, All);

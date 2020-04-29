@@ -8,10 +8,10 @@
 // conditions signed by you and all SDK and API requirements,
 // specifications, and documentation provided by HTC to You."
 
+#include "WaveVRInputFunctionLibrary.h"
 #include "WaveVRInput.h"
 #include "WaveVREventCommon.h"
 #include "WaveVRPrivatePCH.h"
-#include "Classes/WaveVRInputFunctionLibrary.h"
 
 FWaveVRInput* GetWaveVRInput()
 {

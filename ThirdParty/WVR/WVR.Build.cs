@@ -30,20 +30,25 @@ public class WVR : ModuleRules
 		);
 
 		if(Target.Platform == UnrealTargetPlatform.Android) {
-			PublicLibraryPaths.Add(WVRSDKLib + "/android/armeabi-v7a");
-			PublicLibraryPaths.Add(WVRSDKLib + "/android/arm64-v8a");
-			PublicAdditionalLibraries.AddRange(
-				new string[] {
-					"wvr_api",
-					"wvr_internal_using_assimp"
+			string[] SharedLibs = {
+			    "libwvr_api.so",
+			    "libwvr_internal_using_assimp.so",
+			};
+			string[] Archs = {
+			    "armeabi-v7a",
+			    "arm64-v8a",
+			};
+			foreach (string so in SharedLibs)
+			{
+				foreach (string arch in Archs)
+				{
+					PublicAdditionalLibraries.Add(Path.Combine(WVRSDKLib, "android", arch, so));
 				}
-			);
+			}
 		} else if (Target.bBuildEditor == true) {
-			PublicLibraryPaths.Add(WVRSDKLib + "/Win64/");
 			PublicDelayLoadDLLs.Add("WaveVR_Simulator.dll");
 			RuntimeDependencies.Add(WVRSDKLib + "/Win64/WaveVR_Simulator.dll");
 		} else if (Target.Platform == UnrealTargetPlatform.Win64){
-			PublicLibraryPaths.Add(WVRSDKLib + "/Win64/");
 			PublicDelayLoadDLLs.Add("wave_api.dll");
 			RuntimeDependencies.Add(WVRSDKLib + "/Win64/wave_api.dll");
 		}

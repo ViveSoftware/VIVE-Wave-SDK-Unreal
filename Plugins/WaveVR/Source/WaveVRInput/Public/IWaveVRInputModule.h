@@ -9,7 +9,7 @@
 // specifications, and documentation provided by HTC to You."
 
 #pragma once
-#include "ModuleManager.h"
+#include "Modules/ModuleManager.h"
 #include "IInputDeviceModule.h"
 
 /**

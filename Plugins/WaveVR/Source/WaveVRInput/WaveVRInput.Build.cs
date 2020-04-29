@@ -16,7 +16,8 @@ namespace UnrealBuildTool.Rules
 	{
 		public WaveVRInput(ReadOnlyTargetRules Target) : base(Target)
 		{
-			PrivatePCHHeaderFile = "Private/WaveVRInput.h";
+			PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
+
 			var EngineDir = Path.GetFullPath(Target.RelativeEnginePath);
 			var openglDrvPrivatePath = Path.Combine(EngineDir, @"Source\Runtime\OpenGLDrv\Private");
 			var openglPath = Path.Combine(EngineDir, @"Source\ThirdParty\OpenGL");

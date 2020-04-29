@@ -23,6 +23,7 @@
 UENUM(BlueprintType)
 enum class EWVR_SoftwareIpd_value : uint8
 {
+	EWVR_IPD_VALUE_Invalid = 0,
 	EWVR_IPD_VALUE_56 = 1,
 	EWVR_IPD_VALUE_63 = 2,
 	EWVR_IPD_VALUE_70 = 3,

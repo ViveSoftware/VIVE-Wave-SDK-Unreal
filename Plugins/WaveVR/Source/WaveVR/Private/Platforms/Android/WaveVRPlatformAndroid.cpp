@@ -8,15 +8,13 @@
 // conditions signed by you and all SDK and API requirements,
 // specifications, and documentation provided by HTC to You."
 
-#include <string>
-
-#include "../WaveVRAPIWrapper.h"
-
 #if PLATFORM_ANDROID
-#include "WaveVRLogAndroid.h"
 #include "WaveVRPlatformAndroid.h"
-#include "AndroidApplication.h"
-#include "AndroidJNI.h"
+#include <string>
+#include "../WaveVRAPIWrapper.h"
+#include "WaveVRLogAndroid.h"
+#include "Android/AndroidApplication.h"
+#include "Android/AndroidJNI.h"
 
 extern JavaVM* mJavaVM;
 extern JNIEnv* JavaENV;

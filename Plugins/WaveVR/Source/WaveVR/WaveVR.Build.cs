@@ -1,4 +1,4 @@
-﻿// "WaveVR SDK
+// "WaveVR SDK
 // © 2019 HTC Corporation. All Rights Reserved.
 //
 // Unless otherwise required by copyright law and practice,
@@ -19,7 +19,9 @@ namespace UnrealBuildTool.Rules
 		{
 			Debug.Print("Build the WaveVR Plugin");
 			//bUseRTTI = true; // for dynamic_cast.
-			PrivatePCHHeaderFile = "Private/WaveVRPrivatePCH.h";
+
+			PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
+
 			var EngineDir = Path.GetFullPath(Target.RelativeEnginePath);
 			var rendererPrivatePath = Path.Combine(EngineDir, @"Source\Runtime\Renderer\Private");
 
@@ -40,8 +42,6 @@ namespace UnrealBuildTool.Rules
 					"RHI",
 					"RenderCore",
 					"Renderer",
-					"ShaderCore",
-					"UtilityShaders",
 					"InputCore",
 					"HeadMountedDisplay",
 					"Slate",

@@ -8,8 +8,8 @@
 // conditions signed by you and all SDK and API requirements,
 // specifications, and documentation provided by HTC to You."
 
-#include "WaveVRPrivatePCH.h"
 #include "AdaptiveController.h"
+#include "WaveVRPrivatePCH.h"
 #include "AdaptiveControllerLoader.h"
 #include "Logging/LogMacros.h"
 
@@ -56,17 +56,17 @@ AAdaptiveController::AAdaptiveController()
 					LOGD(AdaptiveController, "Emitter is found");
 					CurrMesh->SetupAttachment(RootComponent);
 					CurrMesh->SetRelativeTransform(FTransform(Multi_TransformsOfMeshes[i]));
-					CurrMesh->bVisible = true;
+					CurrMesh->SetVisibility(true);
 				}
 				else if (FName(*Multi_meshNames[i]) == FName(TEXT("__CM__Battery"))) {
 					LOGD(AdaptiveController, "Battery is found");
 					CurrMesh->SetupAttachment(SceneComponent);
 					CurrMesh->SetRelativeTransform(FTransform(Multi_TransformsOfMeshes[i]));
-					CurrMesh->bVisible = false;
+					CurrMesh->SetVisibility(false);
 				} else {
 					CurrMesh->SetRelativeTransform(FTransform(Multi_TransformsOfMeshes[i]));
 					CurrMesh->SetupAttachment(SceneComponent);
-					CurrMesh->bVisible = bUsingNewFbxDesigned ? false : true; //Hide to decrease draw call.
+					CurrMesh->SetVisibility(bUsingNewFbxDesigned ? false : true); //Hide to decrease draw call.
 				}
 				Multi_meshes.Add(CurrMesh);
 			}
@@ -79,7 +79,7 @@ AAdaptiveController::AAdaptiveController()
 						if (Multi_meshNames[j] == One_meshNames[i]){
 							bMatch = true;
 							LOGD(AdaptiveController, "Set Multi_meshes (%s) Visible as true", TCHAR_TO_ANSI(*Multi_meshNames[j]));
-							Multi_meshes[j]->bVisible = true;
+							Multi_meshes[j]->SetVisibility(true);
 							break;
 						}
 					}
@@ -92,7 +92,7 @@ AAdaptiveController::AAdaptiveController()
 						CurrMesh->bUseAsyncCooking = true; // New in UE 4.17, multi-threaded PhysX cooking.
 						CurrMesh->SetRelativeTransform(FTransform(One_TransformsOfMeshes[i]));
 						CurrMesh->SetupAttachment(SceneComponent);
-						CurrMesh->bVisible = true;
+						CurrMesh->SetVisibility(true);
 						One_meshes.Add(CurrMesh);
 						KeepIndex.Add(i);
 					}

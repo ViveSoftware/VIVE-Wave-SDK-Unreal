@@ -8,8 +8,8 @@
 // conditions signed by you and all SDK and API requirements,
 // specifications, and documentation provided by HTC to You."
 
-#include "WaveVRPrivatePCH.h"
 #include "WaveVRSplash.h"
+#include "WaveVRPrivatePCH.h"
 #include "WaveVRHMD.h"
 #include "WaveVRRender.h"
 #include "ClearQuad.h"
@@ -59,11 +59,12 @@ void FWaveVRSplash::Init()
 		bInitialized = true;
 	}
 
-	ENQUEUE_UNIQUE_RENDER_COMMAND_ONEPARAMETER(RegisterAsyncTick,
-	FWaveVRSplash*, pWaveVRSplash, this,
-	{
-		pWaveVRSplash->AllocateSplashWrapper_RenderThread();
-	});
+	FWaveVRSplash * pWaveVRSplash = this;
+	ENQUEUE_RENDER_COMMAND(AllocateSplashWrapper)(
+		[pWaveVRSplash](FRHICommandListImmediate& RHICmdList)
+		{
+			pWaveVRSplash->AllocateSplashWrapper_RenderThread();
+		});
 }
 
 void FWaveVRSplash::OnPreLoadMap(const FString&)
@@ -114,11 +115,12 @@ void FWaveVRSplash::Show()
 		FWaveVRAPIWrapper::GetInstance()->ShowOverlay(SplashOverlayId);
 	}
 
-	ENQUEUE_UNIQUE_RENDER_COMMAND_ONEPARAMETER(RegisterAsyncTick,
-	FWaveVRSplash*, pWaveVRSplash, this,
-	{
+	FWaveVRSplash * pWaveVRSplash = this;
+	ENQUEUE_RENDER_COMMAND(SubmitSplash)(
+		[pWaveVRSplash](FRHICommandListImmediate& RHICmdList)
+			{
 		pWaveVRSplash->SubmitFrame_RenderThread();
-	});
+		});
 	FlushRenderingCommands();
 
 	bIsShown = true;
@@ -158,47 +160,52 @@ void FWaveVRSplash::RenderStereo_RenderThread()
 		FIntRect DstRect = FIntRect(0, 0, ViewportWidth, ViewportHeight);
 		RHICmdList.SetViewport(DstRect.Min.X, DstRect.Min.Y, 0, DstRect.Max.X, DstRect.Max.Y, 1.0f);
 
-		SetRenderTarget(RHICmdList, SplashWrapperRHIRef, FTextureRHIRef());
-		DrawClearQuad(RHICmdList, BackGroundColor);
-
-		if (SplashTexture != nullptr && SplashTexture->IsValidLowLevel())
+		//SetRenderTarget(RHICmdList, SplashWrapperRHIRef, FTextureRHIRef());
+		FRHIRenderPassInfo RPInfo(SplashWrapperRHIRef, ERenderTargetActions::DontLoad_Store);
+		RHICmdList.BeginRenderPass(RPInfo, TEXT("BlitSplashTexture"));
 		{
-			auto ShaderMap = GetGlobalShaderMap(GMaxRHIFeatureLevel);
-			TShaderMapRef<FScreenVS> VertexShader(ShaderMap);
-			TShaderMapRef<FScreenPS> PixelShader(ShaderMap);
-			FGraphicsPipelineStateInitializer GraphicsPSOInit;
-			RHICmdList.ApplyCachedRenderTargets(GraphicsPSOInit);
+			DrawClearQuad(RHICmdList, BackGroundColor);
 
-			GraphicsPSOInit.BlendState = TStaticBlendState<CW_RGBA, BO_Add, BF_SourceAlpha, BF_InverseSourceAlpha, BO_Add, BF_One, BF_InverseSourceAlpha>::GetRHI();
-			GraphicsPSOInit.RasterizerState = TStaticRasterizerState<FM_Solid, CM_None, true, false>::GetRHI();
-			GraphicsPSOInit.DepthStencilState = TStaticDepthStencilState<false, CF_Always>::GetRHI();
-			GraphicsPSOInit.BoundShaderState.VertexDeclarationRHI = RendererModule->GetFilterVertexDeclaration().VertexDeclarationRHI;
-			GraphicsPSOInit.BoundShaderState.VertexShaderRHI = GETSAFERHISHADER_VERTEX(*VertexShader);
-			GraphicsPSOInit.BoundShaderState.PixelShaderRHI = GETSAFERHISHADER_PIXEL(*PixelShader);
-			GraphicsPSOInit.PrimitiveType = PT_TriangleList;
-			SetGraphicsPipelineState(RHICmdList, GraphicsPSOInit);
+			if (SplashTexture != nullptr && SplashTexture->IsValidLowLevel())
+			{
+				auto ShaderMap = GetGlobalShaderMap(GMaxRHIFeatureLevel);
+				TShaderMapRef<FScreenVS> VertexShader(ShaderMap);
+				TShaderMapRef<FScreenPS> PixelShader(ShaderMap);
+				FGraphicsPipelineStateInitializer GraphicsPSOInit;
+				RHICmdList.ApplyCachedRenderTargets(GraphicsPSOInit);
 
-			//Apply Splash texture texels
-			PixelShader->SetParameters(RHICmdList, TStaticSamplerState<SF_Trilinear>::GetRHI(), SplashTexture->Resource->TextureRHI);
+				GraphicsPSOInit.BlendState = TStaticBlendState<CW_RGBA, BO_Add, BF_SourceAlpha, BF_InverseSourceAlpha, BO_Add, BF_One, BF_InverseSourceAlpha>::GetRHI();
+				GraphicsPSOInit.RasterizerState = TStaticRasterizerState<FM_Solid, CM_None, true, false>::GetRHI();
+				GraphicsPSOInit.DepthStencilState = TStaticDepthStencilState<false, CF_Always>::GetRHI();
+				GraphicsPSOInit.BoundShaderState.VertexDeclarationRHI = GFilterVertexDeclaration.VertexDeclarationRHI;
+				GraphicsPSOInit.BoundShaderState.VertexShaderRHI = GETSAFERHISHADER_VERTEX(*VertexShader);
+				GraphicsPSOInit.BoundShaderState.PixelShaderRHI = GETSAFERHISHADER_PIXEL(*PixelShader);
+				GraphicsPSOInit.PrimitiveType = PT_TriangleList;
+				SetGraphicsPipelineState(RHICmdList, GraphicsPSOInit);
 
-			float RenderOffsetX = PositionShift.X + (1.0f - ScaleFactor) * 0.5 * ViewportWidth;
-			float RenderOffsetY = PositionShift.Y + (1.0f - ScaleFactor) * 0.5 * ViewportHeight;
+				//Apply Splash texture texels
+				PixelShader->SetParameters(RHICmdList, TStaticSamplerState<SF_Trilinear>::GetRHI(), SplashTexture->Resource->TextureRHI);
 
-			float RenderTargetSizeX = ViewportWidth * ScaleFactor;
-			float RenderTargetSizeY = ViewportHeight * ScaleFactor;
+				float RenderOffsetX = PositionShift.X + (1.0f - ScaleFactor) * 0.5 * ViewportWidth;
+				float RenderOffsetY = PositionShift.Y + (1.0f - ScaleFactor) * 0.5 * ViewportHeight;
 
-			RendererModule->DrawRectangle(
-				RHICmdList,
-				RenderOffsetX , RenderOffsetY,         //top left corner of the quad
-				RenderTargetSizeX, RenderTargetSizeY,
-				0.0, 0.0,                              //U, V
-				1.0, 1.0,                              //USize, VSize,
-				FIntPoint(ViewportWidth, ViewportHeight),
-				FIntPoint(1, 1),
-				*VertexShader,
-				EDRF_Default);
+				float RenderTargetSizeX = ViewportWidth * ScaleFactor;
+				float RenderTargetSizeY = ViewportHeight * ScaleFactor;
+
+				RendererModule->DrawRectangle(
+					RHICmdList,
+					RenderOffsetX, RenderOffsetY,         //top left corner of the quad
+					RenderTargetSizeX, RenderTargetSizeY,
+					0.0, 0.0,                              //U, V
+					1.0, 1.0,                              //USize, VSize,
+					FIntPoint(ViewportWidth, ViewportHeight),
+					FIntPoint(1, 1),
+					*VertexShader,
+					EDRF_Default);
+				}
+			bSplashScreenRendered = true;
 		}
-		bSplashScreenRendered = true;
+		RHICmdList.EndRenderPass();
 	}
 }
 
@@ -217,12 +224,13 @@ bool FWaveVRSplash::ApplyTexture()
 		SplashTexture->AddToRoot();
 		SplashTexture->UpdateResource();
 
-		ENQUEUE_UNIQUE_RENDER_COMMAND_ONEPARAMETER(RegisterAsyncTick,
-		FWaveVRSplash*, pWaveVRSplash, this,
-		{
-			pWaveVRSplash->bSplashScreenRendered = false;
-			pWaveVRSplash->RenderStereo_RenderThread();
-		});
+		FWaveVRSplash * pWaveVRSplash = this;
+		ENQUEUE_RENDER_COMMAND(ApplySplashTexture) (
+			[pWaveVRSplash](FRHICommandListImmediate& RHICmdList)
+			{
+				pWaveVRSplash->bSplashScreenRendered = false;
+				pWaveVRSplash->RenderStereo_RenderThread();
+			});
 		FlushRenderingCommands();
 		ret = true;
 	} else {

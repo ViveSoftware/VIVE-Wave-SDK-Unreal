@@ -8,9 +8,8 @@
 // conditions signed by you and all SDK and API requirements,
 // specifications, and documentation provided by HTC to You."
 
-#include "WaveVRInput.h"
 #include "WaveVRPawnMotionController.h"
-
+#include "WaveVRInput.h"
 
 // Sets default values
 AWaveVRPawnMotionController::AWaveVRPawnMotionController()

@@ -8,8 +8,8 @@
 // conditions signed by you and all SDK and API requirements,
 // specifications, and documentation provided by HTC to You."
 
-#include "WaveVRPrivatePCH.h"
 #include "WaveVRJson.h"
+#include "WaveVRPrivatePCH.h"
 
 //---------------------------------------------------------------------------
 FString UWaveVRJson::WaveVR_GetKeyValue(FString category, FString key) {

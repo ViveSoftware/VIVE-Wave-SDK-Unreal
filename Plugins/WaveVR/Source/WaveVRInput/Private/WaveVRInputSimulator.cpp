@@ -8,8 +8,8 @@
 // conditions signed by you and all SDK and API requirements,
 // specifications, and documentation provided by HTC to You."
 
-#include "WaveVRInput.h"
 #include "WaveVRInputSimulator.h"
+#include "WaveVRInput.h"
 
 WaveVRInputSimulator::WaveVRInputSimulator()
 	: uContext(nullptr)

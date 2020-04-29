@@ -8,12 +8,11 @@
 // conditions signed by you and all SDK and API requirements,
 // specifications, and documentation provided by HTC to You."
 
+#include "WaveVRRender.h"
 #include "WaveVRPrivatePCH.h"
-
 #include "Logging/LogMacros.h"
 
 #include "WaveVRHMD.h"
-#include "WaveVRRender.h"
 #include "RHIUtilities.h"
 #include "OpenGLResources.h"
 #include "XRThreadUtils.h"
@@ -604,7 +603,7 @@ FTexture2DRHIRef FWaveVRTextureManager::AllocateDepthTexture(const FWaveVRRender
 	depthInfo = engineInfo;
 
 	depthInfo.arraySize = mRender->GetMultiView() ? 2 : 1;
-	depthInfo.numSamples =  mRender->GetMultiSampleLevel();
+	depthInfo.numSamples = 1; // mRender->GetMultiSampleLevel();  // GLES didn't support depth multisample
 	// In OpengGLRenderTarget.cpp: Depth should be GL_TEXTURE_2D_ARRAY
 	depthInfo.target = mRender->GetMultiView() ? GL_TEXTURE_2D_ARRAY : GL_TEXTURE_2D;
 	depthInfo.format = PF_DepthStencil;  // ignore PF_X24_G8
@@ -846,8 +845,9 @@ void FWaveVRRender::RenderInit()
 	}
 	else
 	{
-		ENQUEUE_UNIQUE_RENDER_COMMAND_ONEPARAMETER(RenderInit,
-			FWaveVRRender*, pRender, this,
+		FWaveVRRender * pRender = this;
+		ENQUEUE_RENDER_COMMAND(RenderInit) (
+			[pRender](FRHICommandListImmediate& RHICmdList)
 			{
 				pRender->RenderInit_RenderThread();
 			});
@@ -1125,6 +1125,8 @@ bool FWaveVRRender::AllocateRenderTargetTexture(
 // May be not necessary
 bool FWaveVRRender::AllocateDepthTexture(uint32 Index, uint32 SizeX, uint32 SizeY, uint8 Format, uint32 NumMips, uint32 Flags, uint32 TargetableTextureFlags, FTexture2DRHIRef& OutTargetableTexture, FTexture2DRHIRef& OutShaderResourceTexture, uint32 NumSamples)
 {
+	return false;
+#if 0
 	//LOG_FUNC();
 	LOGI(WVRRender, "AllocateDepthTexture TextureInfo width=%u height=%u mips=%u samples=%u flags=%u targetFlags=%u, format=%u",
 		SizeX, SizeY, NumMips, NumSamples, Flags, TargetableTextureFlags, Format);
@@ -1160,6 +1162,7 @@ bool FWaveVRRender::AllocateDepthTexture(uint32 Index, uint32 SizeX, uint32 Size
 	}
 
 	return ret;
+#endif
 }
 
 /* FWaveVRRender Get and Set */
@@ -1357,7 +1360,9 @@ void FWaveVRRender::OnResume()
 		WVR()->SetATWActive(true, GNativeAndroidApp->window);
 		WVR()->SetRenderThreadId(GGameThreadId);
 	} else {
-		ENQUEUE_UNIQUE_RENDER_COMMAND(OnResume,
+		FWaveVRRender * pRender = this;
+		ENQUEUE_RENDER_COMMAND(OnResume) (
+			[pRender](FRHICommandListImmediate& RHICmdList)
 			{
 				WVR()->SetATWActive(true, GNativeAndroidApp->window);
 				WVR()->SetRenderThreadId(GGameThreadId);
@@ -1376,7 +1381,9 @@ void FWaveVRRender::OnPause()
 		// No, we don't release textures when suspend.  This will cause a resume problem.
 		//mTextureManager.CleanTextures();
 	} else {
-		ENQUEUE_UNIQUE_RENDER_COMMAND(Reset,
+		FWaveVRRender * pRender = this;
+		ENQUEUE_RENDER_COMMAND(Reset)(
+			[pRender](FRHICommandListImmediate& RHICmdList)
 			{
 				WVR()->PauseATW();
 				// No, we don't release textures when suspend.  This will cause a resume problem.
@@ -1392,8 +1399,9 @@ void FWaveVRRender::Shutdown()
 	bInitialized = false;
 	needReAllocateRenderTargetTexture = true;
 
-	ENQUEUE_UNIQUE_RENDER_COMMAND_ONEPARAMETER(Shutdown,
-		FWaveVRRender*, pRender, this,
+	FWaveVRRender * pRender = this;
+	ENQUEUE_RENDER_COMMAND(Shutdown) (
+		[pRender](FRHICommandListImmediate& RHICmdList)
 		{
 			WVR()->PauseATW();
 			// No, we don't release textures when shutdown.  TextureManager will handle it.

@@ -87,4 +87,7 @@ dependencies {
         }
 	implementation fileTree(dir: 'libs', include: ['*.jar'])
 	implementation fileTree(dir: 'src/main/libs', include: ['*.jar'])
+
+	implementation "android.arch.lifecycle:extensions:1.1.1"
+	annotationProcessor "android.arch.lifecycle:compiler:1.1.1"
 }

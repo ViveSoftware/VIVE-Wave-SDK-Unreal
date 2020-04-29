@@ -12,8 +12,8 @@
 * Created by devinyu on 2017/9/27.
 */
 
-#include "WaveVRPrivatePCH.h"
 #include "WaveVRPermissionManager.h"
+#include "WaveVRPrivatePCH.h"
 #include "Logging/LogMacros.h"
 
 #include <vector>

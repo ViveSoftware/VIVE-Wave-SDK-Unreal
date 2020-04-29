@@ -26,7 +26,7 @@ static const unsigned int EWVR_DeviceType_Count = 4;
 UENUM(BlueprintType)
 enum class EWVR_DeviceType : uint8
 {
-	DeviceType_Invalid              = WVR_DeviceType::WVR_DeviceType_Invalid,
+	DeviceType_Invalid              = 0, //WVR_DeviceType::WVR_DeviceType_Invalid
 	DeviceType_HMD                  = WVR_DeviceType::WVR_DeviceType_HMD,
 	DeviceType_Controller_Right     = WVR_DeviceType::WVR_DeviceType_Controller_Right,
 	DeviceType_Controller_Left      = WVR_DeviceType::WVR_DeviceType_Controller_Left,
@@ -35,7 +35,7 @@ enum class EWVR_DeviceType : uint8
 UENUM(BlueprintType)
 enum class EWVR_InputId : uint8
 {
-	NoUse = WVR_InputId::WVR_InputId_Alias1_System,
+	NoUse = 0, //WVR_InputId::WVR_InputId_Alias1_System
 	Menu = WVR_InputId::WVR_InputId_Alias1_Menu,
 	Grip = WVR_InputId::WVR_InputId_Alias1_Grip,
 	DPad_Left = WVR_InputId::WVR_InputId_Alias1_DPad_Left,
@@ -78,7 +78,7 @@ static const EWVR_InputId InputButton[InputButtonCount] =
 UENUM(BlueprintType)
 enum class EWVR_TouchId : uint8
 {
-	NoUse = WVR_InputId::WVR_InputId_Alias1_System,
+	NoUse = 0, //WVR_InputId::WVR_InputId_Alias1_System
 	Touchpad = WVR_InputId::WVR_InputId_Alias1_Touchpad,
 	Trigger = WVR_InputId::WVR_InputId_Alias1_Trigger,
 	Thumbstick = WVR_InputId::WVR_InputId_Alias1_Thumbstick,
@@ -97,6 +97,7 @@ static const EWVR_TouchId TouchButton[TouchButtonCount] =
 UENUM(BlueprintType)
 enum class EWVR_Hand : uint8
 {
+	Hand_Controller_Invalid = 0,
 	Hand_Controller_Right = 2,  // WVR_DeviceType::WVR_DeviceType_Controller_Right
 	Hand_Controller_Left = 3    // WVR_DeviceType::WVR_DeviceType_Controller_Left
 };

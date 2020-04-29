@@ -8,16 +8,16 @@
 // conditions signed by you and all SDK and API requirements,
 // specifications, and documentation provided by HTC to You."
 
-#include "WaveVRPrivatePCH.h"
 #include "WaveVRContentProvider.h"
+#include "WaveVRPrivatePCH.h"
 #include "WaveVREventCommon.h"
 #include "Logging/LogMacros.h"
 
 DEFINE_LOG_CATEGORY_STATIC(WaveVRContentProvider, Display, All);
 
 #if PLATFORM_ANDROID
-#include "AndroidApplication.h"
-#include "AndroidJNI.h"
+#include "Android/AndroidApplication.h"
+#include "Android/AndroidJNI.h"
 
 extern JavaVM* mJavaVM;
 extern JNIEnv* JavaENV;

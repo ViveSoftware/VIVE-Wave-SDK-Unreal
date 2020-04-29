@@ -1,4 +1,4 @@
-﻿// "WaveVR SDK
+// "WaveVR SDK
 // © 2019 HTC Corporation. All Rights Reserved.
 //
 // Unless otherwise required by copyright law and practice,
@@ -8,9 +8,8 @@
 // conditions signed by you and all SDK and API requirements,
 // specifications, and documentation provided by HTC to You."
 
-#include "WaveVRPrivatePCH.h"
-
 #include "Platforms/Windows/WaveVRPlatformWindows.h"
+#include "WaveVRPrivatePCH.h"
 #include "Platforms/DLLFunctionPointer.h"
 
 DEFINE_LOG_CATEGORY_STATIC(WVR_Windows, Log, All);

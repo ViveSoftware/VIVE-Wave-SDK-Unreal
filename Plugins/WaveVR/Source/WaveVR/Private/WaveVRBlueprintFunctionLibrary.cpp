@@ -8,12 +8,12 @@
 // conditions signed by you and all SDK and API requirements,
 // specifications, and documentation provided by HTC to You."
 
+#include "WaveVRBlueprintFunctionLibrary.h"
 #include "WaveVRPrivatePCH.h"
 #include "WaveVRHMD.h"
 #include "PoseManagerImp.h"
 #include "WaveVRSplash.h"
 #include "Platforms/Editor/WaveVRDirectPreview.h"
-#include "WaveVRBlueprintFunctionLibrary.h"
 #include "Runtime/ImageWrapper/Public/IImageWrapper.h"
 #include "Runtime/ImageWrapper/Public/IImageWrapperModule.h"
 #include "WaveVRScreenshot.h"

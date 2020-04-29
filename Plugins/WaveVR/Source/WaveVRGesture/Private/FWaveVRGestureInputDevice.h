@@ -14,7 +14,7 @@
 #include "WaveVRGestureUtils.h"
 #include "FWaveVRGestureThread.h"
 
-#include "IInputInterface.h"
+#include "GenericPlatform/IInputInterface.h"
 #include "Runtime/Engine/Classes/Kismet/KismetMathLibrary.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogWaveVRGestureInputDevice, Log, All);

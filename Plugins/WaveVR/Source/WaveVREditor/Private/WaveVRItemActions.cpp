@@ -8,12 +8,12 @@
 // conditions signed by you and all SDK and API requirements,
 // specifications, and documentation provided by HTC to You."
 
-#include "Interfaces/IPluginManager.h"
 #include "WaveVRItemActions.h"
+#include "Interfaces/IPluginManager.h"
 #include <SocketSubsystem.h>
 #include <IPAddress.h>
-#include "PlatformFilemanager.h"
-#include "GenericPlatformFile.h"
+#include "HAL/PlatformFilemanager.h"
+#include "GenericPlatform/GenericPlatformFile.h"
 
 DEFINE_LOG_CATEGORY_STATIC(WVRMenuItemAction, Display, All);
 

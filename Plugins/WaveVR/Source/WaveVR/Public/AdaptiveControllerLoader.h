@@ -18,6 +18,7 @@
 UENUM(BlueprintType)
 enum class EWVR_TouchpadIndex : uint8
 {
+	EWVR_TouchpadIndex_Invalid = 0,
 	EWVR_TouchpadIndex_Center = 1,
 	EWVR_TouchpadIndex_Up = 2,
 	EWVR_TouchpadIndex_Right = 3
