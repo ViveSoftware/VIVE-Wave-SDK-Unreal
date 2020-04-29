@@ -42,7 +42,7 @@ inline void WaveVRDrawIndexedPrimitive(
 	RHIUnlockIndexBuffer(IndexBufferRHI);
 
 	RHICmdList.SetStreamSource(0, VertexBufferRHI, 0);
-	RHICmdList.DrawIndexedPrimitive(IndexBufferRHI, PrimitiveType, MinVertexIndex, 0, NumVertices, 0, NumPrimitives, 1);
+	RHICmdList.DrawIndexedPrimitive(IndexBufferRHI, MinVertexIndex, 0, NumVertices, 0, NumPrimitives, 1);
 
 	IndexBufferRHI.SafeRelease();
 	VertexBufferRHI.SafeRelease();

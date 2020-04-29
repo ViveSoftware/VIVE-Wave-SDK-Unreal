@@ -81,25 +81,25 @@ void FWaveAR::UpdateData(){
 void FWaveAR::CreateFakePlane() {
 	LOG_FUNC();
 
-	FTransform FakeTransform = FTransform(FQuat::Identity, FVector(100, 0, -100));
-	FTransform HMDTransform = FTransform(CachedOrientation, CachedPosition);
-	FTransform HMDTransformInverse = HMDTransform.Inverse();
-	FTransform FakeTransformLocalToTracking;
-	FTransform::Multiply(&FakeTransformLocalToTracking, &HMDTransformInverse, &FakeTransform);
+	//FTransform FakeTransform = FTransform(FQuat::Identity, FVector(100, 0, -100));
+	//FTransform HMDTransform = FTransform(CachedOrientation, CachedPosition);
+	//FTransform HMDTransformInverse = HMDTransform.Inverse();
+	//FTransform FakeTransformLocalToTracking;
+	//FTransform::Multiply(&FakeTransformLocalToTracking, &HMDTransformInverse, &FakeTransform);
 
-	CachedAllTrackedGeometry.Empty();
-	UARPlaneGeometry* PlaneObject = NewObject<UARPlaneGeometry>();
-	PlaneObject->UpdateTrackedGeometry(
-		FWaveVRHMD::GetARSystem().ToSharedRef(),//const TSharedRef < FARSupportInterface , ESPMode::ThreadSafe > & InTrackingSystem,
-		0,                      //uint32 FrameNumber,
-		0,                      //double Timestamp,
-		FakeTransform,          //FakeTransformLocalToTracking, //const FTransform & InLocalToTrackingTransform, //TODO: This should get from runtime, now we fake it as fixed transform.
-		FTransform::Identity,   //GetAlignmentTransform(),  //const FTransform & InAlignmentTransform,
-		FVector(0, 0, 0),       //const FVector InCenter,
-		FVector(50, 50, 0)      //const FVector InExtent
-	);
-	UARTrackedGeometry* NewTrackableObject = static_cast<UARTrackedGeometry*>(PlaneObject);
-	CachedAllTrackedGeometry.Add(NewTrackableObject);
+	//CachedAllTrackedGeometry.Empty();
+	//UARPlaneGeometry* PlaneObject = NewObject<UARPlaneGeometry>();
+	//PlaneObject->UpdateTrackedGeometry(
+	//	FWaveVRHMD::GetARSystem().ToSharedRef(),//const TSharedRef < FARSupportInterface , ESPMode::ThreadSafe > & InTrackingSystem,
+	//	0,                      //uint32 FrameNumber,
+	//	0,                      //double Timestamp,
+	//	FakeTransform,          //FakeTransformLocalToTracking, //const FTransform & InLocalToTrackingTransform, //TODO: This should get from runtime, now we fake it as fixed transform.
+	//	FTransform::Identity,   //GetAlignmentTransform(),  //const FTransform & InAlignmentTransform,
+	//	FVector(0, 0, 0),       //const FVector InCenter,
+	//	FVector(50, 50, 0)      //const FVector InExtent
+	//);
+	//UARTrackedGeometry* NewTrackableObject = static_cast<UARTrackedGeometry*>(PlaneObject);
+	//CachedAllTrackedGeometry.Add(NewTrackableObject);
 }
 
 /****************************************************
@@ -147,21 +147,21 @@ FARSessionStatus FWaveVRHMD::OnGetARSessionStatus() const
 void FWaveVRHMD::OnSetAlignmentTransform(const FTransform& InAlignmentTransform)
 {
 	LOG_FUNC();
-	const FTransform& NewAlignmentTransform = InAlignmentTransform;
+	//const FTransform& NewAlignmentTransform = InAlignmentTransform;
 
-	TArray<UARTrackedGeometry*> AllTrackedGeometries = GetAllTrackedGeometries();
-	for (UARTrackedGeometry* TrackedGeometry : AllTrackedGeometries)
-	{
-		TrackedGeometry->UpdateAlignmentTransform(NewAlignmentTransform);
-	}
+	//TArray<UARTrackedGeometry*> AllTrackedGeometries = GetAllTrackedGeometries();
+	//for (UARTrackedGeometry* TrackedGeometry : AllTrackedGeometries)
+	//{
+	//	TrackedGeometry->UpdateAlignmentTransform(NewAlignmentTransform);
+	//}
 
-	TArray<UARPin*> AllARPins = GetAllPins();
-	for (UARPin* SomePin : AllARPins)
-	{
-		SomePin->UpdateAlignmentTransform(NewAlignmentTransform);
-	}
+	//TArray<UARPin*> AllARPins = GetAllPins();
+	//for (UARPin* SomePin : AllARPins)
+	//{
+	//	SomePin->UpdateAlignmentTransform(NewAlignmentTransform);
+	//}
 
-	SetAlignmentTransform_Internal(InAlignmentTransform);
+	//SetAlignmentTransform_Internal(InAlignmentTransform);
 }
 
 TArray<FARTraceResult> FWaveVRHMD::OnLineTraceTrackedObjects(const FVector2D ScreenCoord, EARLineTraceChannels TraceChannels)
@@ -171,6 +171,13 @@ TArray<FARTraceResult> FWaveVRHMD::OnLineTraceTrackedObjects(const FVector2D Scr
 	TArray<FARTraceResult> OutHitResults;
 	return OutHitResults;
 }
+
+TArray<FARTraceResult> FWaveVRHMD::OnLineTraceTrackedObjects(const FVector Start, const FVector End, EARLineTraceChannels TraceChannels) {
+	LOG_FUNC();
+	TArray<FARTraceResult> OutHitResults;
+	return OutHitResults;
+}
+
 
 TArray<UARTrackedGeometry*> FWaveVRHMD::OnGetAllTrackedGeometries() const
 {
@@ -225,6 +232,10 @@ TArray<FVector> FWaveVRHMD::OnGetPointCloud() const
 	return TArray<FVector>();
 }
 
+bool FWaveVRHMD::OnAddRuntimeCandidateImage(UARSessionConfig* SessionConfig, UTexture2D* CandidateTexture, FString FriendlyName, float PhysicalWidth) {
+	return false;
+}
+
 /****************************************************
  *
  * FARSystemBase
@@ -233,14 +244,14 @@ TArray<FVector> FWaveVRHMD::OnGetPointCloud() const
 
 void FWaveVRHMD::AddReferencedObjects(FReferenceCollector& Collector)
 {
-	LOG_FUNC();
-	FARSystemBase::AddReferencedObjects(Collector);
+	//LOG_FUNC();
+	//FARSystemBase::AddReferencedObjects(Collector);
 
-	if (mWaveAR->GetLightEstimate() != nullptr)
-	{
-		UARLightEstimate* LightEstimate = mWaveAR->GetLightEstimate();
-		Collector.AddReferencedObject(LightEstimate);
-	}
+	//if (mWaveAR->GetLightEstimate() != nullptr)
+	//{
+	//	UARLightEstimate* LightEstimate = mWaveAR->GetLightEstimate();
+	//	Collector.AddReferencedObject(LightEstimate);
+	//}
 }
 
 void* FWaveVRHMD::GetARSessionRawPointer()

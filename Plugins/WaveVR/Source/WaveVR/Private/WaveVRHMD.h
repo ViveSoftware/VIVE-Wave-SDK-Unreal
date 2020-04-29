@@ -35,7 +35,7 @@ class WaveVRDirectPreview;
 /**
  * WaveVR Head Mounted Display
  */
-class FWaveVRHMD : public FARSystemBase, public IHeadMountedDisplay, public IStereoRendering
+class FWaveVRHMD : public FHeadMountedDisplayBase, public IARSystemSupport, public FSceneViewExtensionBase
 {
 private:
 	const bool bUseUnrealDistortion;
@@ -70,16 +70,16 @@ public:
 	virtual void UpdateScreenSettings(const class FViewport* InViewport) override { LOG_FUNC(); }
 	virtual void UpdatePostProcessSettings(FPostProcessSettings*) override { LOG_FUNC(); }
 	virtual bool NeedsUpscalePostProcessPass() override { LOG_FUNC(); return false; }
-	virtual void RecordAnalytics() override { LOG_FUNC(); }
+	virtual void RecordAnalytics() override { LOG_FUNC(); FHeadMountedDisplayBase::RecordAnalytics(); }
 	virtual bool IsRenderingPaused() const { LOG_FUNC(); return IHeadMountedDisplay::IsRenderingPaused();/*false*/ }
 	virtual void SetClippingPlanes(float NCP, float FCP) override;
 
 	/** IHeadMountedDisplay interface not used*/
 	virtual void EnableHMD(bool allow = true) override;
 	virtual void GetFieldOfView(float& OutHFOVInDegrees, float& OutVFOVInDegrees) const override;
-	virtual bool IsSpectatorScreenActive() const override { LOG_FUNC(); return false; } //UE do not support SpectatorScreen on mobile device now.
-	virtual class ISpectatorScreenController* GetSpectatorScreenController() override { LOG_FUNC(); return nullptr; }
-	virtual class ISpectatorScreenController const* GetSpectatorScreenController() const override { LOG_FUNC(); return nullptr; }
+	virtual bool IsSpectatorScreenActive() const override { LOG_FUNC(); return false; /*return FHeadMountedDisplayBase::IsSpectatorScreenActive();*/ } //UE do not support SpectatorScreen on mobile device now.
+	virtual class ISpectatorScreenController* GetSpectatorScreenController() override { LOG_FUNC(); return FHeadMountedDisplayBase::GetSpectatorScreenController(); }
+	virtual class ISpectatorScreenController const* GetSpectatorScreenController() const override { LOG_FUNC(); return FHeadMountedDisplayBase::GetSpectatorScreenController(); }
 	virtual float GetDistortionScalingFactor() const override { LOG_FUNC(); return 0; }
 	virtual float GetLensCenterOffset() const override { LOG_FUNC(); return 0; }
 	virtual void GetDistortionWarpValues(FVector4& K) const override { LOG_FUNC(); }
@@ -98,6 +98,19 @@ public:
 	virtual bool DoesAppUseVRFocus() const override { LOG_FUNC(); return IHeadMountedDisplay::DoesAppUseVRFocus(); }
 	virtual bool DoesAppHaveVRFocus() const override { LOG_FUNC(); return IHeadMountedDisplay::DoesAppHaveVRFocus(); }
 	virtual EHMDWornState::Type GetHMDWornState() override { return EHMDWornState::Unknown; }
+
+        //** FHeadMountedDisplayBase interface */
+        virtual bool PopulateAnalyticsAttributes(TArray<struct FAnalyticsEventAttribute>& EventAttributes) override { LOG_FUNC(); return FHeadMountedDisplayBase::PopulateAnalyticsAttributes(EventAttributes);}
+        virtual FTexture2DRHIRef GetOverlayLayerTarget_RenderThread(EStereoscopicPass StereoPass, FIntRect& InOutViewport) override {LOG_FUNC(); return nullptr; }
+        virtual FTexture2DRHIRef GetSceneLayerTarget_RenderThread(EStereoscopicPass StereoPass, FIntRect& InOutViewport) override {LOG_FUNC(); return nullptr; }
+
+        //** FHeadMountedDisplayBase interface not used*/
+        virtual FVector2D GetEyeCenterPoint_RenderThread(EStereoscopicPass Eye) const override { LOG_FUNC(); return FHeadMountedDisplayBase::GetEyeCenterPoint_RenderThread(Eye);}
+        virtual FIntRect GetFullFlatEyeRect_RenderThread(FTexture2DRHIRef EyeTexture) const override { LOG_FUNC(); return FHeadMountedDisplayBase::GetFullFlatEyeRect_RenderThread(EyeTexture); }
+        virtual void CopyTexture_RenderThread(FRHICommandListImmediate& RHICmdList, FTexture2DRHIParamRef SrcTexture, FIntRect SrcRect, FTexture2DRHIParamRef DstTexture, FIntRect DstRect, bool bClearBlack, bool bNoAlpha) const {
+                LOG_FUNC();
+                FHeadMountedDisplayBase::CopyTexture_RenderThread(RHICmdList, SrcTexture, SrcRect, DstTexture, DstRect, bClearBlack, bNoAlpha);
+        }
 
 	/** IXRTrackingSystem interface */
 	virtual bool DoesSupportLateUpdate() const override;
@@ -143,6 +156,8 @@ public:
 	virtual void UpdateExternalTrackingPosition(const FTransform& ExternalTrackingTransform) override { LOG_FUNC(); FXRTrackingSystemBase::UpdateExternalTrackingPosition(ExternalTrackingTransform); } //Do not use now, we should reconsider GetBaseOrientation/SetBaseOrientation/GetBasePosition/SetBasePosition if use it.
 	virtual class IHeadMountedDisplay* GetHMDDevice() override { return this; }
 	virtual float GetWorldToMetersScale() const override;
+	virtual bool IsHeadTrackingEnforced() const { LOG_FUNC(); return FHeadMountedDisplayBase::IsHeadTrackingEnforced(); }
+	virtual void SetHeadTrackingEnforced(bool bEnabled) { LOG_FUNC(); FHeadMountedDisplayBase::SetHeadTrackingEnforced(bEnabled); }
 
 	/** FXRTrackingSystemBase interface not used*/
 
@@ -162,30 +177,25 @@ public:
 	virtual FMatrix GetStereoProjectionMatrix(const EStereoscopicPass StereoPassType) const override;
 	virtual void InitCanvasFromView(FSceneView* InView, UCanvas* Canvas) override;
 	virtual void RenderTexture_RenderThread(class FRHICommandListImmediate& RHICmdList, class FRHITexture2D* BackBuffer, class FRHITexture2D* SrcTexture, FVector2D WindowSize) const override { LOG_FUNC(); }
-	virtual IStereoLayers* GetStereoLayers() override { LOG_FUNC(); return nullptr; }
+	virtual IStereoLayers* GetStereoLayers() override { LOG_FUNC(); return FHeadMountedDisplayBase::GetStereoLayers(); }
 	virtual IStereoRenderTargetManager* GetRenderTargetManager() override { LOG_FUNC(); return &mRender; }
 
 	/** IStereoRendering interface not used */
 
 public:
-	class FWaveSceneViewExtension : public FSceneViewExtensionBase
-	{
-public:
-		FWaveSceneViewExtension(const FAutoRegister& AutoRegister);
-		/** ISceneViewExtension interface */
-		virtual void SetupViewFamily(FSceneViewFamily& InViewFamily) override { LOG_FUNC(); }
-		virtual void SetupView(FSceneViewFamily& InViewFamily, FSceneView& InView) override { LOG_FUNC(); }
-		virtual void SetupViewPoint(APlayerController* Player, FMinimalViewInfo& InViewInfo) override { LOG_FUNC(); }
-		virtual void SetupViewProjectionMatrix(FSceneViewProjectionData& InOutProjectionData) override { LOG_FUNC(); }
-		virtual void BeginRenderViewFamily(FSceneViewFamily& InViewFamily) override { LOG_FUNC(); }
-		virtual void PreRenderViewFamily_RenderThread(FRHICommandListImmediate& RHICmdList, FSceneViewFamily& InViewFamily) override { LOG_FUNC(); }
-		virtual void PreRenderView_RenderThread(FRHICommandListImmediate& RHICmdList, FSceneView& InView) override { LOG_FUNC(); }
-		virtual void PostRenderBasePass_RenderThread(FRHICommandListImmediate& RHICmdList, FSceneView& InView) override { LOG_FUNC(); }
-		virtual void PostRenderViewFamily_RenderThread(FRHICommandListImmediate& RHICmdList, FSceneViewFamily& InViewFamily) override;
-		virtual void PostRenderView_RenderThread(FRHICommandListImmediate& RHICmdList, FSceneView& InView) override { LOG_FUNC(); }
-		virtual int32 GetPriority() const override { LOG_FUNC(); return 0; }
-		virtual bool IsActiveThisFrame(class FViewport* InViewport) const override { LOG_FUNC(); return true; }
-	};
+	/** ISceneViewExtension interface */
+	virtual void SetupViewFamily(FSceneViewFamily& InViewFamily) override { LOG_FUNC(); }
+	virtual void SetupView(FSceneViewFamily& InViewFamily, FSceneView& InView) override { LOG_FUNC(); }
+	virtual void SetupViewPoint(APlayerController* Player, FMinimalViewInfo& InViewInfo) override { LOG_FUNC(); }
+	virtual void SetupViewProjectionMatrix(FSceneViewProjectionData& InOutProjectionData) override { LOG_FUNC(); }
+	virtual void BeginRenderViewFamily(FSceneViewFamily& InViewFamily) override { LOG_FUNC(); }
+	virtual void PreRenderViewFamily_RenderThread(FRHICommandListImmediate& RHICmdList, FSceneViewFamily& InViewFamily) override { LOG_FUNC(); }
+	virtual void PreRenderView_RenderThread(FRHICommandListImmediate& RHICmdList, FSceneView& InView) override { LOG_FUNC(); }
+	virtual void PostRenderBasePass_RenderThread(FRHICommandListImmediate& RHICmdList, FSceneView& InView) override { LOG_FUNC(); }
+	virtual void PostRenderViewFamily_RenderThread(FRHICommandListImmediate& RHICmdList, FSceneViewFamily& InViewFamily) override;
+	virtual void PostRenderView_RenderThread(FRHICommandListImmediate& RHICmdList, FSceneView& InView) override { LOG_FUNC(); }
+	virtual int32 GetPriority() const override { LOG_FUNC(); return 0; }
+	virtual bool IsActiveThisFrame(class FViewport* InViewport) const override { LOG_FUNC(); return true; }
 
 protected:
 	// IARSystemSupport
@@ -197,6 +207,7 @@ protected:
 	virtual FARSessionStatus OnGetARSessionStatus() const override;
 	virtual void OnSetAlignmentTransform(const FTransform& InAlignmentTransform) override;
 	virtual TArray<FARTraceResult> OnLineTraceTrackedObjects(const FVector2D ScreenCoord, EARLineTraceChannels TraceChannels) override;
+	virtual TArray<FARTraceResult> OnLineTraceTrackedObjects(const FVector Start, const FVector End, EARLineTraceChannels TraceChannels) override;
 	virtual TArray<UARTrackedGeometry*> OnGetAllTrackedGeometries() const override;
 	virtual TArray<UARPin*> OnGetAllPins() const override;
 	virtual bool OnIsTrackingTypeSupported(EARSessionType SessionType) const override;
@@ -212,6 +223,8 @@ protected:
 	virtual EARWorldMappingState OnGetWorldMappingStatus() const override;
 	virtual TArray<FARVideoFormat> OnGetSupportedVideoFormats(EARSessionType SessionType) const override { LOG_FUNC(); return TArray<FARVideoFormat>(); }
 	virtual TArray<FVector> OnGetPointCloud() const override;
+	virtual bool OnAddRuntimeCandidateImage(UARSessionConfig* SessionConfig, UTexture2D* CandidateTexture, FString FriendlyName, float PhysicalWidth) override;
+
 
 public:
 	/** FARSystemBase interface */
@@ -219,7 +232,7 @@ public:
 	void* GetGameThreadARFrameRawPointer() override;
 protected:
 	//~ FGCObject
-	virtual void AddReferencedObjects(FReferenceCollector& Collector) override;
+	virtual void AddReferencedObjects(FReferenceCollector& Collector) /*override*/;
 
 public:
 	FrameDataPtr FrameData;
@@ -231,11 +244,11 @@ private:
 	void NextFrameData();
 
 public:
-	static void SetARSystem(TSharedPtr<FARSystemBase, ESPMode::ThreadSafe> InArSystem) { ArSystem = InArSystem; }
-	static TSharedPtr<FARSystemBase, ESPMode::ThreadSafe> GetARSystem() { return ArSystem; }
+	static void SetARSystem(TSharedPtr<IARSystemSupport, ESPMode::ThreadSafe> InArSystem) { ArSystem = InArSystem; }
+	static TSharedPtr<IARSystemSupport, ESPMode::ThreadSafe> GetARSystem() { return ArSystem; }
 
 private:
-	static TSharedPtr<FARSystemBase, ESPMode::ThreadSafe> ArSystem;
+	static TSharedPtr<IARSystemSupport, ESPMode::ThreadSafe> ArSystem;
 
 public:
 	bool IsStereoEnabledInternal() const;
@@ -348,7 +361,7 @@ private:
 
 public:
 
-	FWaveVRHMD();
+	FWaveVRHMD(const FAutoRegister& AutoRegister);
 	virtual ~FWaveVRHMD();
 
 	// distortion mesh
@@ -416,8 +429,6 @@ private:
 	bool FirstGameFrame;
 	bool bAdaptiveQuality;
 	static WaveVRDirectPreview * DirectPreview;
-	TSharedPtr<FWaveSceneViewExtension, ESPMode::ThreadSafe> SceneViewExtension;
-	void SetSceneViewExtension(TSharedPtr<FWaveSceneViewExtension, ESPMode::ThreadSafe> InSceneView) { SceneViewExtension = InSceneView; }
 
 	struct LateUpdateConfig {
 		LateUpdateConfig() : bEnabled(true), bDoUpdateInGT(false), predictTimeInGT(0) {}
