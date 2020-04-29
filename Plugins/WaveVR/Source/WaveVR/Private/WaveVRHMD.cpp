@@ -85,6 +85,7 @@ public:
 	// This code should be here.  The FWaveVRPlugin must be the one who decide the platform, not decide in the wrapper.
 	FWaveVRAPIWrapper * CreateWaveVRInstance()
 	{
+		LOGI(WVRHMD, "CreateWaveVRInstance()");
 		FWaveVRAPIWrapper * instance = nullptr;
 #if PLATFORM_ANDROID
 		instance = new FWaveVRPlatformAndroid();
@@ -102,7 +103,8 @@ public:
 
 	virtual void StartupModule() override
 	{
-		LOG_FUNC();
+		LOGI(WVRHMD, "StartupModule()+");
+
 		IHeadMountedDisplayModule::StartupModule();
 		// If use DirectPreview
 
@@ -111,11 +113,13 @@ public:
 		if (PlatFormContext != nullptr) {
 			PlatFormContext->LoadLibraries();
 		}
+
+		LOGI(WVRHMD, "StartupModule()-");
 	}
 
 	virtual void ShutdownModule() override
 	{
-		LOG_FUNC();
+		LOGI(WVRHMD, "ShutdownModule()");
 		IHeadMountedDisplayModule::ShutdownModule();
 		auto PlatFormContext = WVR();
 		if (PlatFormContext != nullptr) {
@@ -128,12 +132,8 @@ IMPLEMENT_MODULE( FWaveVRPlugin, WaveVR )
 
 TSharedPtr< class IXRTrackingSystem, ESPMode::ThreadSafe > FWaveVRPlugin::CreateTrackingSystem()
 {
-	LOG_FUNC_IF(WAVEVR_LOG_ENTRY_LIFECYCLE);
-	TSharedPtr< FWaveVRHMD, ESPMode::ThreadSafe > WaveVRHMD = NewARSystem<FWaveVRHMD>();
+	TSharedRef< FWaveVRHMD, ESPMode::ThreadSafe > WaveVRHMD = FSceneViewExtensions::NewExtension<FWaveVRHMD>();
 	FWaveVRHMD::SetARSystem(WaveVRHMD);
-
-	TSharedPtr< FWaveVRHMD::FWaveSceneViewExtension, ESPMode::ThreadSafe > SceneViewExtension = FSceneViewExtensions::NewExtension<FWaveVRHMD::FWaveSceneViewExtension>();
-	WaveVRHMD->SetSceneViewExtension(SceneViewExtension);
 
 	return WaveVRHMD;
 }
@@ -146,7 +146,7 @@ FWaveVRHMD * FWaveVRHMD::Instance = nullptr;
 
 WaveVRDirectPreview * FWaveVRHMD::DirectPreview = nullptr;
 
-TSharedPtr<FARSystemBase, ESPMode::ThreadSafe> FWaveVRHMD::ArSystem = nullptr;
+TSharedPtr<IARSystemSupport, ESPMode::ThreadSafe> FWaveVRHMD::ArSystem = nullptr;
 
 bool FWaveVRHMD::IsHMDEnabled() const
 {
@@ -355,16 +355,7 @@ bool FWaveVRHMD::IsChromaAbCorrectionEnabled() const
 bool FWaveVRHMD::IsHeadTrackingAllowed() const
 {
 	LOG_FUNC();
-#if WITH_EDITOR
-	if (GIsEditor)
-	{
-		// @todo vreditor: We need to do a pass over VREditor code and make sure we are handling the VR modes correctly.  HeadTracking can be enabled without Stereo3D, for example
-		UEditorEngine* EdEngine = Cast<UEditorEngine>(GEngine);
-		//LOGI(WVRHMD,"IsHeadTrackingAllowed !EdEngine(%u) EdEngine->IsHMDTrackingAllowed()(%u) IsStereoEnabled()(%u)", EdEngine, EdEngine->IsHMDTrackingAllowed(), IsStereoEnabled());
-		return (!EdEngine || EdEngine->IsHMDTrackingAllowed()) && IsStereoEnabled();
-	}
-#endif // WITH_EDITOR
-	return true;
+	return FHeadMountedDisplayBase::IsHeadTrackingAllowed();
 }
 
 void FWaveVRHMD::OnBeginPlay(FWorldContext& InWorldContext)
@@ -560,6 +551,7 @@ void FWaveVRHMD::OnLateUpdateApplied_RenderThread(const FTransform& NewRelativeT
 {
 	WVR_SCOPED_NAMED_EVENT(OnLateUpdateApplied, FColor::Purple);
 	LOG_FUNC();
+	FHeadMountedDisplayBase::OnLateUpdateApplied_RenderThread(NewRelativeTransform);
 }
 
 
@@ -570,7 +562,7 @@ void FWaveVRHMD::SetTrackingOrigin(EHMDTrackingOrigin::Type InOrigin)
 }
 
 
-EHMDTrackingOrigin::Type FWaveVRHMD::GetTrackingOrigin()
+EHMDTrackingOrigin::Type FWaveVRHMD::GetTrackingOrigin() const
 {
 	LOG_FUNC();
 	return PoseMngr->GetTrackingOriginPoses();
@@ -1095,7 +1087,7 @@ void FWaveVRHMD::SetFinalViewRect(const enum EStereoscopicPass StereoPass, const
 void FWaveVRHMD::CalculateStereoViewOffset(const EStereoscopicPass StereoPassType, FRotator& ViewRotation, const float WorldToMeters, FVector& ViewLocation)
 {
 	LOG_FUNC();
-	GetXRCamera()->CalculateStereoCameraOffset(StereoPassType, ViewRotation, ViewLocation);
+	FHeadMountedDisplayBase::CalculateStereoViewOffset(StereoPassType, ViewRotation, WorldToMeters, ViewLocation);
 }
 
 FMatrix FWaveVRHMD::GetStereoProjectionMatrix(const enum EStereoscopicPass StereoPassType) const
@@ -1108,7 +1100,7 @@ FMatrix FWaveVRHMD::GetStereoProjectionMatrix(const enum EStereoscopicPass Stere
 		return LeftProjection;
 	} else if (StereoPassType == eSSP_RIGHT_EYE) {
 		return RightProjection;
-	} else if (StereoPassType == eSSP_MONOSCOPIC_EYE) {
+	} else if (StereoPassType == eSSP_FULL) {
 		return CenterProjection;
 	}
 
@@ -1118,10 +1110,13 @@ FMatrix FWaveVRHMD::GetStereoProjectionMatrix(const enum EStereoscopicPass Stere
 void FWaveVRHMD::InitCanvasFromView(FSceneView* InView, UCanvas* Canvas)
 {
 	LOG_FUNC();
+	FHeadMountedDisplayBase::InitCanvasFromView(InView, Canvas);
 }
 
-FWaveVRHMD::FWaveVRHMD()
-	: bUseUnrealDistortion(GIsEditor)
+FWaveVRHMD::FWaveVRHMD(const FAutoRegister& AutoRegister)
+	: FHeadMountedDisplayBase(nullptr)
+	, FSceneViewExtensionBase(AutoRegister)
+	, bUseUnrealDistortion(GIsEditor)
 
 	, isInputRequested_Hmd(false)
 	, isInputRequested_Right(false)
@@ -1547,10 +1542,7 @@ bool FWaveVRHMD::IsSplashShowing() {
 	return false;
 }
 
-FWaveVRHMD::FWaveSceneViewExtension::FWaveSceneViewExtension(const FAutoRegister& AutoRegister)
-: FSceneViewExtensionBase(AutoRegister) {}
-
-void FWaveVRHMD::FWaveSceneViewExtension::PostRenderViewFamily_RenderThread(FRHICommandListImmediate& RHICmdList, FSceneViewFamily& InViewFamily)
+void FWaveVRHMD::PostRenderViewFamily_RenderThread(FRHICommandListImmediate& RHICmdList, FSceneViewFamily& InViewFamily)
 {
 	LOG_FUNC();
 #if WITH_EDITOR

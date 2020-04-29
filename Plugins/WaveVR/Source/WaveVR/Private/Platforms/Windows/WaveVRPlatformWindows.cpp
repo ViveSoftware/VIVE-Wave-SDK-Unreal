@@ -1,4 +1,4 @@
-﻿// "WaveVR SDK
+// "WaveVR SDK
 // © 2019 HTC Corporation. All Rights Reserved.
 //
 // Unless otherwise required by copyright law and practice,
